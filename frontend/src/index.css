@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  
+  color-scheme: dark; /* Changed to dark */
+  
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  @apply bg-dark-900 text-dark-200; /* Use new dark colors */
+}
+
+#root {
+  width: 100%;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-dark-700 rounded-full hover:bg-dark-600 transition-colors;
+}
+
+/* Utility for text gradients */
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-accent-purple;
+}
+
+/* Card utilities */
+.card-hover {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-500/10;
+}
