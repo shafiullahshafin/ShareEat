@@ -101,20 +101,20 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     address = serializers.CharField(required=False)
     
     # Donor specific
-    business_name = serializers.CharField(required=False)
-    donor_type = serializers.CharField(required=False)
-    license_number = serializers.CharField(required=False)
+    business_name = serializers.CharField(required=False, allow_blank=True)
+    donor_type = serializers.CharField(required=False, allow_blank=True)
+    license_number = serializers.CharField(required=False, allow_blank=True)
     
     # Recipient specific
-    recipient_type = serializers.CharField(required=False)
-    organization_name = serializers.CharField(required=False)
-    capacity = serializers.IntegerField(required=False)
-    current_occupancy = serializers.IntegerField(required=False)
+    recipient_type = serializers.CharField(required=False, allow_blank=True)
+    organization_name = serializers.CharField(required=False, allow_blank=True)
+    capacity = serializers.IntegerField(required=False, allow_null=True)
+    current_occupancy = serializers.IntegerField(required=False, allow_null=True)
     description = serializers.CharField(required=False, allow_blank=True)
     
     # Volunteer specific
-    vehicle_type = serializers.CharField(required=False)
-    vehicle_capacity = serializers.DecimalField(max_digits=5, decimal_places=2, required=False)
+    vehicle_type = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    vehicle_capacity = serializers.DecimalField(max_digits=5, decimal_places=2, required=False, allow_null=True)
     is_available = serializers.BooleanField(required=False)
 
     class Meta:

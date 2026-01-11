@@ -53,12 +53,34 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await authAPI.updateProfile(formData);
+      const cleanData = { ...formData };
+      
+      // Convert empty strings to null for numeric fields to avoid validation errors
+      if (cleanData.vehicle_capacity === '') cleanData.vehicle_capacity = null;
+      if (cleanData.capacity === '') cleanData.capacity = null;
+      if (cleanData.current_occupancy === '') cleanData.current_occupancy = null;
+
+      const response = await authAPI.updateProfile(cleanData);
       updateUser(response.data);
       setIsEditing(false);
     } catch (err) {
       console.error('Failed to update profile:', err);
-      setError('Failed to update profile. Please try again.');
+      let errorMessage = 'Failed to update profile. Please try again.';
+      
+      if (err.response?.data) {
+        if (err.response.data.detail) {
+          errorMessage = err.response.data.detail;
+        } else if (typeof err.response.data === 'object') {
+          // Get the first error message from the validation errors object
+          const entries = Object.entries(err.response.data);
+          if (entries.length > 0) {
+            const [field, errors] = entries[0];
+            const errorText = Array.isArray(errors) ? errors[0] : errors;
+            errorMessage = `${field.replace(/_/g, ' ').charAt(0).toUpperCase() + field.replace(/_/g, ' ').slice(1)}: ${errorText}`;
+          }
+        }
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
