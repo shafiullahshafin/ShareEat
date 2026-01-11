@@ -17,8 +17,11 @@ class Command(BaseCommand):
 
         # 1. Create Admin
         if not User.objects.filter(username='shafiullahshafin').exists():
-            User.objects.create_superuser('shafiullahshafin', 'admin@shareeat.com', 'password123')
-            self.stdout.write('Created Admin: shafiullahshafin')
+            # Use a strong password to avoid browser "data breach" warnings
+            User.objects.create_superuser('shafiullahshafin', 'admin@shareeat.com', 'ShareEatStrongPass2026!')
+            self.stdout.write('Created Admin: shafiullahshafin (Password: ShareEatStrongPass2026!)')
+        else:
+            self.stdout.write('Admin user already exists')
 
         # 2. Food Categories (Ensure they exist)
         cat_cooked, _ = FoodCategory.objects.get_or_create(
