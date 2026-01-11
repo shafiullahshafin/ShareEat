@@ -206,17 +206,17 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
                     <div className="flex gap-2">
                       <input 
                         name="first_name" 
-                        value={formData.first_name} 
+                        value={formData.first_name || ''} 
                         onChange={handleChange}
                         placeholder="First Name"
-                        className="bg-dark-900 border border-dark-600 rounded px-2 py-1 text-lg w-32 focus:outline-none focus:border-brand-500"
+                        className="bg-dark-900 border border-dark-600 rounded px-2 py-1 text-lg w-32 focus:outline-none focus:border-brand-500 text-white"
                       />
                       <input 
                         name="last_name" 
-                        value={formData.last_name} 
+                        value={formData.last_name || ''} 
                         onChange={handleChange}
                         placeholder="Last Name"
-                        className="bg-dark-900 border border-dark-600 rounded px-2 py-1 text-lg w-32 focus:outline-none focus:border-brand-500"
+                        className="bg-dark-900 border border-dark-600 rounded px-2 py-1 text-lg w-32 focus:outline-none focus:border-brand-500 text-white"
                       />
                     </div>
                   ) : (
