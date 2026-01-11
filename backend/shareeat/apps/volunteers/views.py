@@ -13,7 +13,7 @@ from .serializers import (
     VolunteerAvailabilitySerializer, DeliveryRequestSerializer
 )
 from shareeat.utils.routing import DeliveryPlanner
-from shareeat.apps.notifications.utils import send_notification, send_sms
+from shareeat.apps.notifications.utils import send_notification
 
 
 class VolunteerProfileViewSet(viewsets.ModelViewSet):

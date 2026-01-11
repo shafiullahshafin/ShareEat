@@ -82,22 +82,7 @@ const Donations = () => {
 
   const formatStatus = (donation) => {
     if (!donation || !donation.status) return '';
-    const { status, notes, volunteer_name } = donation;
-
-    // Fix for ID #4: If completed but no volunteer assigned, show Approved
-    if (status === 'completed' && (!volunteer_name || volunteer_name === 'Not Assigned')) {
-      return 'Approved';
-    }
-
-    if (status === 'confirmed') return 'Approved';
-    if (status === 'pending_manual_assignment') return 'Approved';
-    
-    if (status === 'cancelled') {
-      if (notes && notes.includes('[Cancelled by Admin]')) {
-        return 'Approved';
-      }
-      return 'Cancelled';
-    }
+    const { status } = donation;
 
     return status
       .split('_')
@@ -108,23 +93,18 @@ const Donations = () => {
   const getStatusIcon = (donation) => {
     const { status } = donation;
     
-    const formattedStatus = formatStatus(donation);
-    if (formattedStatus === 'Approved' && status !== 'cancelled') {
-      return <CheckCircle className="w-3 h-3 mr-1" />;
-    }
-
     switch (status) {
+      case 'confirmed':
       case 'completed':
         return <CheckCircle className="w-3 h-3 mr-1" />;
       case 'in_transit':
       case 'picked_up':
         return <Truck className="w-3 h-3 mr-1" />;
-      // Handled by Approved
       case 'pending':
+      case 'pending_manual_assignment':
         return <Clock className="w-3 h-3 mr-1" />;
       case 'cancelled':
         return <XCircle className="w-3 h-3 mr-1" />;
-      // Handled by Approved
       default:
         return <Clock className="w-3 h-3 mr-1" />;
     }
@@ -160,13 +140,13 @@ const Donations = () => {
 
   const getVolunteerStatus = (donation) => {
     if (donation.status === 'cancelled') return 'Cancelled';
-    if (donation.status === 'pending_manual_assignment') return 'Needs Admin';
+    if (donation.status === 'pending_manual_assignment') return 'Pending Manual Assignment';
     if (!donation.volunteer_name || donation.volunteer_name === 'Not Assigned') return 'Pending';
     if (donation.status === 'confirmed') return 'Assigned';
-    if (donation.status === 'picked_up') return 'On the Way';
-    if (donation.status === 'in_transit') return 'On the Way';
+    if (donation.status === 'picked_up') return 'Picked Up';
+    if (donation.status === 'in_transit') return 'In Transit';
     if (donation.status === 'delivered') return 'Delivered';
-    if (donation.status === 'completed') return 'Delivered';
+    if (donation.status === 'completed') return 'Completed';
     return 'Pending';
   };
 
