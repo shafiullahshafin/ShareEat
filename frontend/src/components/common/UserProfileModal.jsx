@@ -13,6 +13,7 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
   useEffect(() => {
     if (user) {
       setFormData({
+        username: user.username || '',
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         phone: user.phone || '',

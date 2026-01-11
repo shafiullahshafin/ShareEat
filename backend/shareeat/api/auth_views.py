@@ -124,10 +124,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
                   'business_name', 'donor_type', 'license_number',
                   'recipient_type', 'organization_name', 'capacity', 'current_occupancy', 'description',
                   'vehicle_type', 'vehicle_capacity', 'is_available')
-        read_only_fields = ('username',)
+        read_only_fields = ()
 
     def update(self, instance, validated_data):
         # Updates user fields
+        instance.username = validated_data.get('username', instance.username)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.email = validated_data.get('email', instance.email)
