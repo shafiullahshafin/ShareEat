@@ -70,23 +70,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'shareeat.wsgi.application'
 
+import dj_database_url
+
 # Database - PostgreSQL for production
 DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': config('DB_NAME', default='shareeat_db'),
-        'USER': config('DB_USER', default='postgres'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-        'CONN_MAX_AGE': 600,
-    }
+    'default': config(
+        'DATABASE_URL',
+        default='postgres://postgres:@localhost:5432/shareeat_db',
+        cast=dj_database_url.parse
+    )
 }
-
-if config('DB_ENGINE', default='django.db.backends.postgresql') == 'django.db.backends.postgresql':
-    DATABASES['default']['OPTIONS'] = {
-        'connect_timeout': 10,
-    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
