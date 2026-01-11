@@ -15,11 +15,11 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write(self.style.SUCCESS('Initializing Checklist Data Generation...'))
 
-        # 1. Create Admin
+        # Create Admin User
         if not User.objects.filter(username='shafiullahshafin').exists():
-            # Use a strong password to avoid browser "data breach" warnings
-            User.objects.create_superuser('shafiullahshafin', 'admin@shareeat.com', 'ShareEatStrongPass2026!')
-            self.stdout.write('Created Admin: shafiullahshafin (Password: ShareEatStrongPass2026!)')
+            # Easy, unique, and short password
+            User.objects.create_superuser('shafiullahshafin', 'admin@shareeat.com', 'ShareEat@1')
+            self.stdout.write('Created Admin: shafiullahshafin (Password: ShareEat@1)')
         else:
             self.stdout.write('Admin user already exists')
 
