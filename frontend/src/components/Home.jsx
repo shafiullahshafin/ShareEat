@@ -5,6 +5,7 @@ import { analyticsAPI } from '../services/api';
 import { Leaf, Heart, Users, ArrowRight, Zap, ShieldCheck, BarChart3, Utensils, Handshake, ChevronDown, Menu, X } from 'lucide-react';
 
 const Home = () => {
+  // Accesses user authentication context.
   const { user } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,6 +17,7 @@ const Home = () => {
     donations: '0'
   });
 
+  // Fetches public impact statistics on component mount.
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -58,13 +60,14 @@ const Home = () => {
     setIsDropdownOpen(false);
   };
 
+  // Redirects authenticated users to the dashboard.
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
 
   return (
     <div className="h-screen bg-dark-950 font-sans text-white selection:bg-brand-500/30 flex flex-col overflow-hidden">
-      {/* Role Info Modal */}
+      {/* Displays role-specific information in a modal. */}
       {selectedRole && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-dark-900 border border-dark-800 rounded-xl p-8 max-w-md w-full relative shadow-2xl animate-in fade-in zoom-in-95 duration-200">
@@ -101,7 +104,7 @@ const Home = () => {
                 <span className="text-xl font-display font-bold text-white tracking-tight">ShareEat</span>
               </div>
               
-              {/* Desktop Nav */}
+              {/* Renders the desktop navigation bar. */}
               <div className="hidden md:flex items-center space-x-4">
                  <div className="relative">
                    <button 
@@ -139,7 +142,7 @@ const Home = () => {
                 </Link>
               </div>
 
-              {/* Mobile Menu Button */}
+              {/* Toggles the mobile menu visibility. */}
               <div className="md:hidden">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -178,7 +181,7 @@ const Home = () => {
           )}
         </nav>
 
-      {/* Main Content */}
+      {/* Renders the main page content including hero section and features. */}
       <main className="flex-grow flex flex-col justify-center relative z-10 w-full max-w-[95%] mx-auto px-6 md:px-12">
         
         {/* Hero Section */}

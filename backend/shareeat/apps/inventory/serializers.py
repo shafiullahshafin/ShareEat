@@ -8,7 +8,7 @@ from shareeat.apps.donors.serializers import DonorProfileListSerializer
 
 
 class FoodCategorySerializer(serializers.ModelSerializer):
-    """Serializer for food categories"""
+    """Serializes food category data, including configuration for shelf life and refrigeration."""
     
     class Meta:
         model = FoodCategory
@@ -18,7 +18,7 @@ class FoodCategorySerializer(serializers.ModelSerializer):
 
 class FoodItemSerializer(serializers.ModelSerializer):
     """
-    Serializer for food items
+    Serializes food item details, including donor information, urgency levels, and expiry status.
     """
     donor_name = serializers.CharField(source='donor.business_name', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
@@ -43,13 +43,13 @@ class FoodItemSerializer(serializers.ModelSerializer):
         }
     
     def validate_quantity(self, value):
-        """Validates quantity is positive"""
+        """Validates that the provided quantity is a positive value."""
         if value <= 0:
             raise serializers.ValidationError("Quantity must be greater than 0")
         return value
     
     def validate(self, data):
-        """Validates expiry date is after pickup time"""
+        """Ensures the expiry date occurs after the scheduled pickup time."""
         if 'expiry_date' in data and 'pickup_before' in data:
             if data['expiry_date'] <= data['pickup_before']:
                 raise serializers.ValidationError(
@@ -59,7 +59,7 @@ class FoodItemSerializer(serializers.ModelSerializer):
 
 
 class FoodItemListSerializer(serializers.ModelSerializer):
-    """Lightweight serializer for listing food items"""
+    """Provides a lightweight serialization of food items for list views."""
     donor_name = serializers.CharField(source='donor.business_name', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
     condition_display = serializers.CharField(source='get_condition_display', read_only=True)
@@ -72,7 +72,7 @@ class FoodItemListSerializer(serializers.ModelSerializer):
 
 
 class DonationItemSerializer(serializers.ModelSerializer):
-    """Serializer for donation items"""
+    """Serializes donation item details, including nested food item information."""
     food_item_name = serializers.CharField(source='food_item.name', read_only=True)
     food_item_details = FoodItemListSerializer(source='food_item', read_only=True)
     
@@ -81,7 +81,7 @@ class DonationItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'food_item', 'food_item_name', 'food_item_details', 'quantity']
     
     def validate(self, data):
-        """Validates donation quantity against available stock"""
+        """Ensures the requested donation quantity does not exceed available stock."""
         food_item = data.get('food_item')
         quantity = data.get('quantity')
         
@@ -94,7 +94,7 @@ class DonationItemSerializer(serializers.ModelSerializer):
 
 
 class ImpactMetricsSerializer(serializers.ModelSerializer):
-    """Serializer for impact metrics"""
+    """Serializes impact metrics, tracking waste prevention and social impact statistics."""
     
     class Meta:
         model = ImpactMetrics
@@ -107,7 +107,7 @@ class ImpactMetricsSerializer(serializers.ModelSerializer):
 
 class DonationSerializer(serializers.ModelSerializer):
     """
-    Serializer for donations
+    Serializes full donation details, including nested donor, recipient, and volunteer profiles.
     """
     donor_name = serializers.CharField(source='donor.business_name', read_only=True)
     donor_details = DonorProfileListSerializer(source='donor', read_only=True)
@@ -133,14 +133,14 @@ class DonationSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
     
     def get_volunteer_name(self, obj):
-        """Gets volunteer's full name"""
+        """Retrieves the full name of the assigned volunteer."""
         if obj.volunteer:
             return obj.volunteer.user.get_full_name() or obj.volunteer.user.username
         return None
 
 
 class DonationListSerializer(serializers.ModelSerializer):
-    """Lightweight serializer for listing donations"""
+    """Provides a lightweight serialization of donations for list views, including status summaries."""
     donor_name = serializers.CharField(source='donor.business_name', read_only=True)
     donor_details = DonorProfileListSerializer(source='donor', read_only=True)
     recipient_name = serializers.CharField(source='recipient.organization_name', read_only=True)
@@ -161,7 +161,7 @@ class DonationListSerializer(serializers.ModelSerializer):
         ]
 
     def get_volunteer_name(self, obj):
-        """Gets volunteer's full name"""
+        """Retrieves the full name of the assigned volunteer."""
         if obj.volunteer:
             return obj.volunteer.user.get_full_name() or obj.volunteer.user.username
         
@@ -173,7 +173,7 @@ class DonationListSerializer(serializers.ModelSerializer):
         return "Not Assigned"
 
     def get_volunteer_phone(self, obj):
-        """Gets volunteer's phone number"""
+        """Retrieves the phone number of the assigned volunteer or the pending volunteer."""
         if obj.volunteer:
             return obj.volunteer.phone
         
@@ -185,7 +185,7 @@ class DonationListSerializer(serializers.ModelSerializer):
         return None
 
     def get_volunteer_status(self, obj):
-        """Gets volunteer status"""
+        """Determines the current status of the volunteer assignment based on donation progress."""
         if obj.volunteer:
              # Donation has an assigned volunteer. Status depends on donation progress.
              if obj.status == 'confirmed': return 'Assigned'
@@ -216,7 +216,7 @@ class DonationListSerializer(serializers.ModelSerializer):
 
 
 class DonationCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating donations"""
+    """Handles the deserialization and validation required for creating new donations."""
     items = DonationItemSerializer(many=True)
     
     class Meta:

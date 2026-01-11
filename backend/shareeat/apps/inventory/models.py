@@ -17,7 +17,7 @@ from django.utils import timezone
 
 class FoodCategory(models.Model):
     """
-    Represents a food category.
+    Represents a category of food items in the system.
     """
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
@@ -39,8 +39,8 @@ class FoodCategory(models.Model):
 
 class FoodItem(models.Model):
     """
-    Represents a food item batch.
-    Tracks quantity, condition, and expiry.
+    Represents a specific batch of food items available for donation.
+    Tracks quantity, condition, and expiry details.
     """
     CONDITION_CHOICES = [
         ('excellent', 'Excellent'),
@@ -95,12 +95,12 @@ class FoodItem(models.Model):
         return f"{self.name} ({self.quantity}{self.unit})"
 
     def save(self, *args, **kwargs):
-        """Overrides save to calculate urgency level."""
+        """Overrides the default save method to automatically recalculate the urgency level before saving."""
         self.urgency_level = self.calculate_urgency()
         super().save(*args, **kwargs)
 
     def calculate_urgency(self):
-        """Determines urgency level based on expiry time."""
+        """Determines the urgency level of the food item based on the time remaining until expiry."""
         now = timezone.now()
         time_until_expiry = (self.expiry_date - now).total_seconds() / 3600  # hours
 
@@ -114,7 +114,7 @@ class FoodItem(models.Model):
 
     @property
     def hours_until_expiry(self):
-        """Calculates hours remaining until expiry."""
+        """Calculates the number of hours remaining until the item expires."""
         if not self.is_available:
             return 0
         delta = self.expiry_date - timezone.now()
@@ -122,12 +122,12 @@ class FoodItem(models.Model):
 
     @property
     def is_expired(self):
-        """Checks if item is expired."""
+        """Checks if the food item has passed its expiry date."""
         return timezone.now() >= self.expiry_date
 
     @property
     def freshness_score(self):
-        """Calculates freshness score (0-100)."""
+        """Calculates a freshness score (0-100) based on remaining shelf life and condition."""
         if self.is_expired:
             return 0
 
@@ -151,8 +151,8 @@ class FoodItem(models.Model):
 
 class Donation(models.Model):
     """
-    Represents a donation transaction.
-    Links donors, recipients, and volunteers.
+    Represents a donation transaction in the system.
+    Links donors, recipients, and volunteers together.
     """
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -213,19 +213,19 @@ class Donation(models.Model):
         return f"Donation #{self.id} - {self.get_status_display()}"
 
     def calculate_total_weight(self):
-        """Aggregates weight from donation items."""
+        """Aggregates the total weight from all items in this donation."""
         total = sum(item.quantity for item in self.items.all())
         self.total_weight = total
         self.save(update_fields=['total_weight'])
 
     def calculate_estimated_meals(self):
-        """Estimates meals based on total weight."""
+        """Estimates the number of meals provided based on total weight (0.4kg per meal)."""
         if self.total_weight > 0:
             self.estimated_meals = int(self.total_weight / Decimal('0.4'))
             self.save(update_fields=['estimated_meals'])
 
     def mark_picked_up(self):
-        """Transitions status to 'picked_up'."""
+        """Transitions the donation status to 'picked_up' and records the time."""
         if self.status == 'confirmed':
             self.status = 'picked_up'
             self.actual_pickup_time = timezone.now()
@@ -234,7 +234,7 @@ class Donation(models.Model):
         return False
 
     def cancel_donation(self):
-        """Cancels donation and restores inventory."""
+        """Cancels the donation and restores the items to the inventory."""
         if self.status in ['pending', 'confirmed']:
             self.status = 'cancelled'
             self.save(update_fields=['status'])
@@ -250,7 +250,7 @@ class Donation(models.Model):
         return False
 
     def mark_delivered(self):
-        """Transitions status to 'delivered'."""
+        """Transitions the donation status to 'delivered' and records the time."""
         if self.status in ['picked_up', 'in_transit']:
             self.status = 'delivered'
             self.actual_delivery_time = timezone.now()
@@ -260,7 +260,7 @@ class Donation(models.Model):
 
     @property
     def delivery_time_minutes(self):
-        """Calculates delivery duration in minutes."""
+        """Calculates the delivery duration in minutes."""
         if self.actual_pickup_time and self.actual_delivery_time:
             delta = self.actual_delivery_time - self.actual_pickup_time
             return delta.total_seconds() / 60
@@ -269,7 +269,7 @@ class Donation(models.Model):
 
 class DonationItem(models.Model):
     """
-    Links Donation and FoodItem.
+    Links a specific FoodItem to a Donation.
     """
     donation = models.ForeignKey(
         Donation,
@@ -295,7 +295,7 @@ class DonationItem(models.Model):
         return f"{self.food_item.name} in Donation #{self.donation.id}"
 
     def save(self, *args, **kwargs):
-        """Validates requested quantity."""
+        """Validates that the requested quantity does not exceed availability."""
         if self.quantity > self.food_item.quantity:
             raise ValueError("Donation quantity cannot exceed available quantity")
         super().save(*args, **kwargs)
@@ -303,7 +303,7 @@ class DonationItem(models.Model):
 
 class ImpactMetrics(models.Model):
     """
-    Stores impact data for completed donations.
+    Stores calculated impact data for completed donations.
     """
     donation = models.OneToOneField(
         Donation,
@@ -330,10 +330,10 @@ class ImpactMetrics(models.Model):
 
     @staticmethod
     def calculate_co2_savings(food_weight_kg):
-        """Estimates CO2 savings based on weight."""
+        """Estimates CO2 emissions saved based on the weight of food diverted from waste."""
         return food_weight_kg * Decimal('2.5')
 
     @staticmethod
     def calculate_tax_deduction(food_weight_kg):
-        """Estimates tax deduction value."""
+        """Estimates the potential tax deduction value for the donation."""
         return food_weight_kg * Decimal('2.0')

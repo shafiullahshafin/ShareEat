@@ -1,5 +1,5 @@
 """
-Analytics engine for generating insights and reports.
+Provides the core analytics engine and report generation utilities for the platform.
 """
 from django.db.models import Sum, Avg, Count, Q, F
 from django.utils import timezone
@@ -10,14 +10,13 @@ from .models import Donation, FoodItem, ImpactMetrics
 
 class AnalyticsEngine:
     """
-    Analytics engine for generating reports and insights.
+    Provides core analytics capabilities for generating insights and reports.
     """
     
     @staticmethod
     def get_dashboard_stats():
         """
-        Get overall dashboard statistics.
-        Returns key metrics for the main dashboard.
+        Calculates and returns overall dashboard statistics including donations, food availability, and impact metrics.
         """
         # Donation stats
         total_donations = Donation.objects.count()
@@ -63,8 +62,7 @@ class AnalyticsEngine:
     @staticmethod
     def get_donation_trends(days=30):
         """
-        Get donation trends over time.
-        Returns daily donation counts and weights.
+        Analyzes donation trends over a specified period, aggregating daily counts and weights.
         """
         start_date = timezone.now() - timedelta(days=days)
         
@@ -83,8 +81,7 @@ class AnalyticsEngine:
     @staticmethod
     def get_donor_performance():
         """
-        Get top performing donors.
-        Ranks donors by total donations and impact.
+        Identifies and ranks top-performing donors based on donation volume and impact.
         """
         from shareeat.apps.donors.models import DonorProfile
         
@@ -113,8 +110,7 @@ class AnalyticsEngine:
     @staticmethod
     def get_recipient_impact():
         """
-        Get recipients by impact received.
-        Shows which organizations are being served most.
+        Evaluates recipient impact by analyzing received donations and support distribution.
         """
         from shareeat.apps.recipients.models import RecipientProfile
         
@@ -144,8 +140,7 @@ class AnalyticsEngine:
     @staticmethod
     def get_food_category_distribution():
         """
-        Get distribution of food by category.
-        Shows which types of food are being donated most.
+        Computes the distribution of donated food items across different categories.
         """
         from .models import FoodCategory
         
@@ -168,8 +163,7 @@ class AnalyticsEngine:
     @staticmethod
     def get_urgency_breakdown():
         """
-        Get breakdown of food items by urgency level.
-        Critical for understanding time-sensitive inventory.
+        Categorizes available food items by urgency level to highlight time-sensitive inventory.
         """
         urgency_stats = FoodItem.objects.filter(
             is_available=True
@@ -198,8 +192,7 @@ class AnalyticsEngine:
     @staticmethod
     def get_volunteer_leaderboard():
         """
-        Get top volunteers by deliveries completed.
-        Gamification element to encourage participation.
+        Generates a leaderboard of top volunteers based on completed deliveries and performance metrics.
         """
         from shareeat.apps.volunteers.models import VolunteerProfile
         
@@ -238,8 +231,7 @@ class AnalyticsEngine:
     @staticmethod
     def get_time_slot_analysis():
         """
-        Analyze which time slots have most donation activity.
-        Helps optimize scheduling.
+        Analyzes donation activity patterns to identify peak time slots for scheduling optimization.
         """
         from django.db.models.functions import ExtractHour
         
@@ -254,8 +246,7 @@ class AnalyticsEngine:
     @staticmethod
     def get_impact_over_time(days=30):
         """
-        Get cumulative impact metrics over time.
-        Shows growth in environmental and social impact.
+        Tracks cumulative environmental and social impact metrics over a specified timeframe.
         """
         start_date = timezone.now() - timedelta(days=days)
         
@@ -275,14 +266,13 @@ class AnalyticsEngine:
 
 class ReportGenerator:
     """
-    Generate formatted reports for different stakeholders.
+    Generates comprehensive, formatted reports tailored for different stakeholders.
     """
     
     @staticmethod
     def generate_donor_report(donor_id, start_date=None, end_date=None):
         """
-        Generate comprehensive report for a donor.
-        Includes donations, impact, and recommendations.
+        Compiles a detailed performance and impact report for a specific donor.
         """
         from shareeat.apps.donors.models import DonorProfile
         

@@ -78,7 +78,7 @@ class DonorProfile(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Override save to handle automatic geocoding.
+        Overrides the save method to handle automatic geocoding logic based on address or coordinate changes.
         
         Logic:
         1. If coordinates exist but location doesn't -> Reverse Geocode.
@@ -194,8 +194,7 @@ class DonorProfile(models.Model):
 
 class DonorSchedule(models.Model):
     """
-    Defines the weekly operating hours for a donor.
-    Used to validate pickup times.
+    Defines the weekly operating hours for a donor, used for validating pickup eligibility.
     """
     DAYS_OF_WEEK = [
         (0, 'Monday'),
@@ -222,7 +221,7 @@ class DonorSchedule(models.Model):
         return f"{self.donor.business_name} - {self.get_day_of_week_display()}"
 
     def is_open_now(self):
-        """Checks if the donor is currently open based on system time."""
+        """Determines if the donor is currently open based on the system's local time."""
         now = timezone.localtime()
         current_day = now.weekday()
         current_time = now.time()

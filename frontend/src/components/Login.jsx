@@ -1,4 +1,4 @@
-// Handles user authentication.
+// Manages the user login process and authentication state.
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

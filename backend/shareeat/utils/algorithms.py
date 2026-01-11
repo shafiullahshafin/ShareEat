@@ -8,11 +8,11 @@ from datetime import datetime, timedelta
 
 
 class FoodMatchingAlgorithm:
-    """Matches food items with recipients."""
+    """Implements logic to match available food items with the most suitable recipients."""
     
     @staticmethod
     def calculate_match_score(food_item, recipient) -> float:
-        """Calculates match score based on urgency, capacity, distance, and needs."""
+        """Computes a compatibility score based on urgency, capacity, proximity, and specific needs."""
         score = 0.0
         
         # Calculates urgency score
@@ -46,7 +46,7 @@ class FoodMatchingAlgorithm:
     
     @staticmethod
     def find_best_matches(food_item, max_matches=5):
-        """Finds best recipient matches."""
+        """Identifies and returns the top-ranking recipient matches for a given food item."""
         from shareeat.apps.recipients.models import RecipientProfile
         
         # Retrieves verified recipients with capacity
@@ -68,11 +68,11 @@ class FoodMatchingAlgorithm:
 
 
 class FoodPrioritizationEngine:
-    """Prioritizes food items."""
+    """Engines for determining the priority order of food items based on urgency and freshness."""
     
     @staticmethod
     def calculate_priority_score(food_item) -> float:
-        """Calculates priority score based on expiry, freshness, and quantity."""
+        """Computes a priority score derived from expiry time, freshness index, and quantity."""
         score = 0.0
         
         # Calculates time urgency
@@ -108,8 +108,7 @@ class FoodPrioritizationEngine:
     @staticmethod
     def get_prioritized_items(queryset, limit=None):
         """
-        Get prioritized list of food items.
-        Returns items sorted by priority score.
+        Retrieves a list of food items sorted by their calculated priority score.
         """
         items_with_scores = []
         
@@ -129,14 +128,13 @@ class FoodPrioritizationEngine:
 
 class DonationOptimizer:
     """
-    Optimizer for creating optimal donation batches.
+    Optimizes the creation of donation batches to maximize utility within constraints.
     """
     
     @staticmethod
     def create_optimal_batch(food_items, recipient, max_weight=None):
         """
-        Create optimal batch of food items for a recipient.
-        Uses greedy algorithm to maximize value while respecting constraints.
+        Constructs an optimal batch of food items for a recipient using a greedy approach.
         
         Returns: List of (food_item, quantity) tuples
         """
@@ -178,13 +176,13 @@ class DonationOptimizer:
     
     @staticmethod
     def estimate_meals_from_batch(batch):
-        """Estimates number of meals."""
+        """Estimates the number of meals provided based on the total weight of the batch."""
         total_weight = sum(quantity for _, quantity in batch)
         return int(total_weight / Decimal('0.4'))
 
 
 def calculate_freshness_index(food_items):
-    """Calculates freshness index."""
+    """Computes the average freshness index for a collection of food items."""
     if not food_items:
         return 0
     
@@ -193,7 +191,7 @@ def calculate_freshness_index(food_items):
 
 
 def get_expiring_soon_items(hours=24):
-    """Retrieves items expiring soon."""
+    """Fetches food items that are approaching their expiry time within a specified window."""
     from django.utils import timezone
     from shareeat.apps.inventory.models import FoodItem
     

@@ -1,5 +1,5 @@
 """
-Provides inventory ViewSets.
+Defines ViewSets for managing inventory, donations, and food categories.
 """
 
 from datetime import timedelta
@@ -31,12 +31,13 @@ from shareeat.apps.notifications.utils import send_notification
 
 class FoodCategoryViewSet(viewsets.ModelViewSet):
     """
-    Manages food categories
+    Handles CRUD operations for food categories, supporting custom ordering.
     """
     queryset = FoodCategory.objects.all()
     serializer_class = FoodCategorySerializer
 
     def get_queryset(self):
+        """Returns the queryset annotated with custom ordering logic."""
         return FoodCategory.objects.annotate(
             custom_order=Case(
                 When(name='Others', then=Value(1)),
@@ -48,21 +49,20 @@ class FoodCategoryViewSet(viewsets.ModelViewSet):
 
 class FoodItemViewSet(viewsets.ModelViewSet):
     """
-    Manages food items
-    Filters by availability, donor, category, urgency, and expiry
+    Manages food item inventory, providing filtering by availability, donor, category, urgency, and expiry.
     """
     queryset = FoodItem.objects.all()
     serializer_class = FoodItemSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self):
-        """Returns serializer class"""
+        """Determines the appropriate serializer class based on the current action."""
         if self.action == 'list':
             return FoodItemListSerializer
         return FoodItemSerializer
 
     def get_queryset(self):
-        """Filters items based on availability, donor, category, urgency, and expiry"""
+        """Filters the queryset based on availability, donor, category, urgency, and expiry criteria."""
         queryset = super().get_queryset()
 
         # Filters by availability
@@ -104,7 +104,7 @@ class FoodItemViewSet(viewsets.ModelViewSet):
         return queryset.order_by('urgency_level', 'expiry_date')
 
     def perform_create(self, serializer):
-        """Associates item with donor profile if user is a donor"""
+        """Links the new food item to the creator's donor profile if applicable."""
         if hasattr(self.request.user, 'donor_profile'):
             serializer.save(donor=self.request.user.donor_profile)
         else:
@@ -113,7 +113,7 @@ class FoodItemViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def request_item(self, request, pk=None):
-        """Requests a specific food item for the current recipient user"""
+        """Processes a request for a specific food item, validating eligibility and availability."""
         food_item = self.get_object()
 
         # Checks authorization
@@ -220,7 +220,7 @@ class FoodItemViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def urgent(self, request):
-        """Retrieves urgent food items expiring soon or marked critical"""
+        """Fetches a list of high-priority food items that are critical or expiring soon."""
         items = FoodItem.objects.filter(
             is_available=True,
             urgency_level__in=['critical', 'high']
@@ -231,7 +231,7 @@ class FoodItemViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def prioritized(self, request):
-        """Retrieves prioritized items based on urgency and expiry"""
+        """Returns a list of food items sorted by priority using the prioritization engine."""
         items = FoodItem.objects.filter(is_available=True)
         prioritized_items = FoodPrioritizationEngine.get_prioritized_items(items, limit=20)
 
@@ -240,7 +240,7 @@ class FoodItemViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def matches(self, request, pk=None):
-        """Calculates match scores for potential recipients"""
+        """Computes compatibility scores between the food item and potential recipients."""
         food_item = self.get_object()
         matches = FoodMatchingAlgorithm.find_best_matches(food_item)
 
@@ -256,7 +256,7 @@ class FoodItemViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def mark_unavailable(self, request, pk=None):
-        """Marks item as unavailable manually"""
+        """Manually updates a food item's status to unavailable."""
         food_item = self.get_object()
         food_item.is_available = False
         food_item.save()
@@ -267,7 +267,7 @@ class FoodItemViewSet(viewsets.ModelViewSet):
 
 class DonationViewSet(viewsets.ModelViewSet):
     """
-    Manages donations
+    Handles the lifecycle of donations, including creation, status updates, and filtering.
     """
     queryset = Donation.objects.all()
     serializer_class = DonationSerializer
@@ -283,7 +283,7 @@ class DonationViewSet(viewsets.ModelViewSet):
     ]
 
     def get_serializer_class(self):
-        """Returns serializer class"""
+        """Determines the appropriate serializer class based on the current action."""
         if self.action == 'list':
             return DonationListSerializer
         elif self.action == 'create':
@@ -291,7 +291,7 @@ class DonationViewSet(viewsets.ModelViewSet):
         return DonationSerializer
 
     def get_queryset(self):
-        """Filters donations based on status, roles, and date range"""
+        """Retrieves and filters donations based on user roles, status, and optional date ranges."""
         # Auto-cancels maintenance task
         try:
             expired_donations = Donation.objects.filter(
@@ -331,7 +331,7 @@ class DonationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def claim(self, request, pk=None):
-        """Claims a donation manually for the current volunteer"""
+        """Assigns the current volunteer to a donation if it is unclaimed."""
         donation = self.get_object()
 
         if not hasattr(request.user, 'volunteer_profile'):
@@ -356,7 +356,7 @@ class DonationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def confirm(self, request, pk=None):
-        """Confirms donation and initiates volunteer matching"""
+        """Validates the donation and triggers the volunteer matching process."""
         donation = self.get_object()
 
         if donation.status != 'pending':
@@ -451,7 +451,7 @@ class DonationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def pickup(self, request, pk=None):
-        """Marks donation as picked up by the volunteer"""
+        """Updates the donation status to 'picked_up' upon volunteer confirmation."""
         donation = self.get_object()
 
         # Authorization: Must be assigned volunteer
@@ -487,7 +487,7 @@ class DonationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def confirm_receipt(self, request, pk=None):
-        """Confirms receipt of goods."""
+        """Finalizes the donation process by confirming receipt and updating the status to 'completed'."""
         donation = self.get_object()
 
         # Authorization
@@ -536,7 +536,7 @@ class DonationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def resolve_exception(self, request, pk=None):
-        """Resolves stuck donations manually by admin intervention"""
+        """Allows administrators to manually resolve donations stuck in an exception state."""
         donation = self.get_object()
         resolution = request.data.get('resolution')  # 'completed', 'cancelled'
 

@@ -12,8 +12,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 class VolunteerProfile(models.Model):
     """
-    Represents a volunteer profile.
-    Tracks vehicle, availability, and rating.
+    Represents a volunteer's profile, tracking vehicle details, availability status, and performance ratings.
     """
     VEHICLE_TYPES = [
         ('bicycle', 'Bicycle'),
@@ -57,7 +56,7 @@ class VolunteerProfile(models.Model):
         return f"{self.user.get_full_name()} - Volunteer"
 
     def update_rating(self):
-        """Updates average rating from completed deliveries."""
+        """Updates the volunteer's average rating based on completed delivery feedback."""
         from django.db.models import Avg
         avg_rating = self.deliveries.filter(
             status='completed',
@@ -69,7 +68,7 @@ class VolunteerProfile(models.Model):
             self.save(update_fields=['rating'])
 
     def increment_delivery_count(self):
-        """Increments total delivery count."""
+        """Increments the total count of completed deliveries."""
         self.total_deliveries += 1
         self.save(update_fields=['total_deliveries'])
 

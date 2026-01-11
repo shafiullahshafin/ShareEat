@@ -1,5 +1,5 @@
 """
-Admin interface for inventory app.
+Configures the Django admin interface for the inventory application.
 """
 from django.contrib import admin
 from .models import FoodCategory, FoodItem, Donation, DonationItem, ImpactMetrics

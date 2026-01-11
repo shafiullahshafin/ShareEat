@@ -1,5 +1,5 @@
 """
-Optimizes delivery routes.
+Provides functionality for optimizing delivery routes and calculating distances.
 """
 import openrouteservice
 from openrouteservice import client
@@ -14,19 +14,19 @@ logger = logging.getLogger(__name__)
 
 
 class RouteOptimizer:
-    """Optimizes routes using OpenRouteService API."""
+    """Handles route optimization interactions with the OpenRouteService API."""
     
     def __init__(self):
-        """Initializes client."""
+        """Initializes the OpenRouteService client with the API key from settings."""
         api_key = settings.OPENROUTESERVICE_API_KEY
         self.client = client.Client(key=api_key) if api_key else None
     
     def calculate_distance(self, coord1: Tuple[float, float], coord2: Tuple[float, float]) -> float:
-        """Calculates distance between coordinates."""
+        """Computes the geodesic distance between two coordinate points."""
         return geodesic(coord1, coord2).kilometers
     
     def get_route(self, start_coords: Tuple[float, float], end_coords: Tuple[float, float]) -> Optional[Dict]:
-        """Retrieves optimized route."""
+        """Fetches an optimized driving route between start and end coordinates."""
         if not self.client:
             # Calculates straight-line distance as fallback
             distance = self.calculate_distance(
@@ -71,7 +71,7 @@ class RouteOptimizer:
             }
     
     def optimize_multi_stop_route(self, waypoints: List[Tuple[float, float]]) -> Optional[Dict]:
-        """Optimizes route with multiple stops."""
+        """Optimizes a multi-stop route by reordering waypoints for efficiency."""
         if not self.client or len(waypoints) < 2:
             return None
         
@@ -102,7 +102,7 @@ class RouteOptimizer:
 
 class DeliveryPlanner:
     """
-    Delivery planning and optimization.
+    Manages the high-level planning and optimization of delivery schedules.
     """
     
     def __init__(self):
@@ -110,7 +110,7 @@ class DeliveryPlanner:
     
     def calculate_delivery_route(self, donor, recipient, volunteer=None) -> Dict:
         """
-        Calculate optimal delivery route from donor to recipient.
+        Calculates the optimal delivery route and timing from donor to recipient.
         
         Returns:
             Dictionary with route details, time estimates, and feasibility
@@ -146,7 +146,7 @@ class DeliveryPlanner:
     
     def find_optimal_volunteer(self, donor, recipient, available_volunteers):
         """
-        Find the best volunteer for a delivery.
+        Identifies the most suitable volunteer for a delivery based on proximity and score.
         Considers Volunteer->Donor distance, vehicle capacity, and availability.
         
         Returns:
@@ -212,7 +212,7 @@ class DeliveryPlanner:
     
     def create_delivery_schedule(self, donations, time_window_hours=4):
         """
-        Create optimized delivery schedule for multiple donations.
+        Generates an optimized delivery schedule by grouping compatible donations.
         Groups deliveries by proximity and time constraints.
         
         Returns:
@@ -252,11 +252,11 @@ class DeliveryPlanner:
 
 
 class MapGenerator:
-    """Generates interactive maps."""
+    """Utilities for generating interactive maps using Folium."""
     
     @staticmethod
     def create_delivery_map(donor, recipient, route_data=None):
-        """Creates delivery map."""
+        """Generates a map visualizing a single delivery route from donor to recipient."""
         # Centers map
         center_lat = (float(donor.latitude) + float(recipient.latitude)) / 2
         center_lon = (float(donor.longitude) + float(recipient.longitude)) / 2
@@ -370,7 +370,7 @@ class MapGenerator:
 
 
 def calculate_carbon_footprint(distance_km: float, vehicle_type: str = 'car') -> float:
-    """Calculates CO2 emissions."""
+    """Estimates CO2 emissions based on travel distance and vehicle type."""
     # Defines emissions per km
     emissions_per_km = {
         'bicycle': 0,
