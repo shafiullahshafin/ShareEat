@@ -38,6 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'recipient_type', 'organization_name', 'capacity', 'current_occupancy',
                   'vehicle_type', 'phone', 'address')
 
+    @transaction.atomic
     def create(self, validated_data):
         role = validated_data.pop('role')
         
@@ -116,18 +117,31 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     vehicle_type = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     vehicle_capacity = serializers.DecimalField(max_digits=5, decimal_places=2, required=False, allow_null=True)
     is_available = serializers.BooleanField(required=False)
+    role = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 
+        fields = ('username', 'email', 'first_name', 'last_name', 'role',
                   'phone', 'address',
                   'business_name', 'donor_type', 'license_number',
                   'recipient_type', 'organization_name', 'capacity', 'current_occupancy', 'description',
                   'vehicle_type', 'vehicle_capacity', 'is_available')
-        read_only_fields = ()
+        read_only_fields = ('role',)
+
+    def get_role(self, obj):
+        """Returns the user role based on the associated profile."""
+        if hasattr(obj, 'donor_profile'):
+            return 'donor'
+        elif hasattr(obj, 'recipient_profile'):
+            return 'recipient'
+        elif hasattr(obj, 'volunteer_profile'):
+            return 'volunteer'
+        elif obj.is_staff:
+            return 'admin'
+        return 'unknown'
 
     def update(self, instance, validated_data):
-        # Updates user fields
+        """Updates user fields."""
         instance.username = validated_data.get('username', instance.username)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)

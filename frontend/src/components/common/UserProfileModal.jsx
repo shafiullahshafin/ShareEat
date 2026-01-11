@@ -191,6 +191,7 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
   };
 
   const getRoleIcon = (role) => {
+    if (!role) return <User className="w-5 h-5" />;
     switch (role) {
       case 'donor': return <Briefcase className="w-5 h-5" />;
       case 'recipient': return <Users className="w-5 h-5" />;
@@ -247,7 +248,7 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
                     </>
                   )}
                   <span className="px-2 py-0.5 text-xs font-medium bg-dark-700 text-brand-400 rounded-full border border-dark-600 uppercase tracking-wide">
-                    {user.role}
+                    {user.role || 'User'}
                   </span>
                 </h2>
                 <p className="text-dark-300 flex items-center gap-1.5 mt-1">
@@ -286,7 +287,7 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
             </div>
 
             {/* Role Specific Info */}
-            {user.role !== 'admin' && (
+            {user.role && user.role !== 'admin' && (
               <div className="col-span-1 md:col-span-2 mt-2">
                 <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
                   {getRoleIcon(user.role)}
