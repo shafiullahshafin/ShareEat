@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Leaf, LogOut, User as UserIcon, LayoutDashboard, Heart, Users, Utensils, Gift, Settings } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE_URL } from '../../services/api';
 import UserProfileModal from '../common/UserProfileModal';
 
 function Navbar() {
@@ -9,6 +10,8 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const adminUrl = API_BASE_URL.replace(/\/api\/?$/, '/admin/');
 
   const handleLogout = () => {
     navigate('/logout');
@@ -90,14 +93,15 @@ function Navbar() {
 
             {/* Renders user actions. */}
             <div className="flex items-center space-x-4">
-              {user.role === 'admin' && (
-                <a 
-                  href="http://localhost:8000/admin/" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-sm font-medium text-dark-400 hover:text-white transition-colors hidden md:block"
+              {user?.is_staff && (
+                <a
+                  href={adminUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-dark-400 hover:text-white hover:bg-dark-800 transition-all duration-200"
                 >
-                  Admin Panel
+                  <Settings className="h-4 w-4 mr-2" />
+                  Admin
                 </a>
               )}
               
