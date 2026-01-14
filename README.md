@@ -128,7 +128,7 @@ The application follows a decoupled client-server architecture:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/yourusername/shareeat.git
+   git clone https://github.com/shafiullahshafin/ShareEat.git
    cd shareeat
    ```
 
