@@ -45,8 +45,9 @@ class DonorProfileViewSet(viewsets.ModelViewSet):
         donor = self.get_object()
         from shareeat.apps.inventory.models import FoodItem
         from shareeat.apps.inventory.serializers import FoodItemListSerializer
+        from django.utils import timezone
 
-        items = FoodItem.objects.filter(donor=donor, is_available=True)
+        items = FoodItem.objects.filter(donor=donor, is_available=True, expiry_date__gt=timezone.now())
         serializer = FoodItemListSerializer(items, many=True)
         return Response(serializer.data)
 

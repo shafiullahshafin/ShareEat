@@ -64,6 +64,9 @@ class FoodItemViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Filters the queryset based on availability, donor, category, urgency, and expiry criteria."""
         queryset = super().get_queryset()
+        
+        # Filter out expired items
+        queryset = queryset.filter(expiry_date__gt=timezone.now())
 
         # Filters by availability
         is_available = self.request.query_params.get('available', None)
@@ -232,7 +235,7 @@ class FoodItemViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def prioritized(self, request):
         """Returns a list of food items sorted by priority using the prioritization engine."""
-        items = FoodItem.objects.filter(is_available=True)
+        items = FoodItem.objects.filter(is_available=True, expiry_date__gt=timezone.now())
         prioritized_items = FoodPrioritizationEngine.get_prioritized_items(items, limit=20)
 
         serializer = FoodItemListSerializer(prioritized_items, many=True)
