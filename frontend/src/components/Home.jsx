@@ -66,7 +66,7 @@ const Home = () => {
   }
 
   return (
-    <div className="h-screen bg-dark-950 font-sans text-white selection:bg-brand-500/30 flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-dark-950 font-sans text-white selection:bg-brand-500/30 flex flex-col">
       {/* Displays role-specific information in a modal. */}
       {selectedRole && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -182,7 +182,7 @@ const Home = () => {
         </nav>
 
       {/* Renders the main page content including hero section and features. */}
-      <main className="flex-grow flex flex-col justify-center relative z-10 w-full max-w-[95%] mx-auto px-6 md:px-12">
+      <main className="flex-grow flex flex-col relative z-10 w-full max-w-[95%] mx-auto px-6 md:px-12 py-12">
         
         {/* Hero Section */}
         <div className="text-center max-w-5xl mx-auto mb-8">
