@@ -113,7 +113,7 @@ const Register = () => {
         <Leaf className="absolute bottom-0 left-0 text-brand-500/5 w-64 h-64 transform -rotate-12 translate-y-20 -translate-x-20" />
       </div>
 
-      <div className="max-w-3xl w-full space-y-8 bg-dark-800 p-8 sm:p-10 rounded-2xl border border-dark-700 shadow-2xl relative z-10 backdrop-blur-sm">
+      <div className="max-w-3xl w-full space-y-8 bg-dark-800 p-6 sm:p-10 rounded-2xl border border-dark-700 shadow-2xl relative z-10 backdrop-blur-sm">
         <div className="text-center">
           <div className="flex justify-center mb-6">
             <Link to="/">
@@ -148,13 +148,13 @@ const Register = () => {
               <button
                 key={r.id}
                 onClick={() => setRole(r.id)}
-                className={`flex-1 flex items-center justify-center space-x-2 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`flex-1 flex items-center justify-center space-x-1.5 sm:space-x-2 px-2 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
                   role === r.id
                     ? 'bg-brand-600 text-white shadow-lg'
                     : 'text-dark-400 hover:text-white hover:bg-dark-700/50'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>{r.label}</span>
               </button>
             );
